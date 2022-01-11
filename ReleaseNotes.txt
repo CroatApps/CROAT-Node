@@ -1,9 +1,9 @@
-## Release Notes from CROAT.community
+####### Release notes by CROAT.community Dev Team ########
 
-Release notes CROAT 2.0.1
+Release Notes CROAT 2.0.1
 
-- Partialy based on Karbowanec 1.6.6 with CROAT needs.
-- First CROAT.community version of CROAT.
+- Partialy based on Karbowanec code with CROAT needs.
+- Developed by CROAT.community Dev Team.
 - HARDFORK to V4 Blocs set at height 1450000
   * This is the most important change in this version! We are introducing V4 Blocks!
   * This version of blocks, disable merged mining as child coin on Pools. 
@@ -14,7 +14,151 @@ Release notes CROAT 2.0.1
 	"cnVariant": 0,
 	"cnBlobType": 0,
 
-## Release Notes from Karbowanec 
+Release Notes CROAT 2.2.1 
+
+- Added news checkpoints to block 2290000
+- Fixed CROAT.community nodes IP'S
+
+
+######## Release Notes from Karbowanec ########
+
+Release notes Karbowanec 1.7.10 
+
+- Option to save raw transaction in hex format in simplewallet without broadcasting it to the network for later relay
+- Various fixes in wallets' internals (fixes several issues reported in GUI wallets, reverts and fixes untraceability borked by one of the recent updates)
+- Minor change in RPC endpoints availability when core is busy
+- Fixed FreeBSD build
+
+Release notes Karbowanec 1.7.8
+
+Misc P2P improvements:
+
+- Some bandwidth saving in the exchange of peer lists
+- Increase the default number of connections from 8 to 12
+- Increase the diffusion speed of peer addresses
+- Gray peer list housekeeping system
+- Ban functionality improvements, added --ban-list option to load ban list from file
+- Drop peers that spam peer lists
+- Reject empty incoming block messages
+- Removed unused code, some code clean up
+
+Release notes Karbowanec 1.7.7
+
+- New output selection for transaction sending - 'smart' input ordering
+- New RPC methods (for faster 'web' wallet syncing)
+- Fix build on some distributions and architectures
+
+Release notes Karbowanec 1.7.6
+
+In this release was added SSL support for RPC with new startup flags for the daemon karbowanecd:
+
+    --rpc-bind-ssl-enable to enable SSL for RPC service
+    --rpc-bind-ssl-port SSL port for RPC service (default port is 32448)
+    --rpc-chain-file (default name "rpc_server.crt", this is the "fullchain.pem" file is you use letsencrypt)
+    --rpc-key-file (default name "rpc_server.key", this is the "privkey.pem")
+    --rpc-dh-file (default name "rpc_server.pem")
+
+The simplewallet also got new flags
+
+    for its wallet RPC server:
+        --rpc-bind-ssl-enable enable SSL for RPC service
+        --rpc-bind-ssl-port (default 15100)
+        --rpc-chain-file (=rpc_server.crt) SSL chain file
+        --rpc-key-file (=rpc_server.key) SSL key file
+        --rpc-dh-file (=rpc_server.pem) SSL DH file
+    for client:
+        --daemon-cert custom certificate file for performing SSL verification
+        --daemon-no-verify disable SSL verification procedure
+
+The walletd also got these flags:
+
+--rpc-ssl-enable
+--bind-port-ssl arg (=16100)
+--rpc-ssl-enable 
+--rpc-chain-file arg (=rpc_server.crt)
+--rpc-key-file arg (=rpc_server.key)
+--rpc-dh-file arg (=rpc_server.pem)
+
+for wallet server
+
+--daemon-port-ssl arg (=32448)
+--daemon-ssl-enable
+--daemon-chain-file arg (=rpc_server.crt)
+--daemon-key-file arg (=rpc_server.key)
+--daemon-dh-file arg (=rpc_server.pem)
+
+for its builtin node.
+
+How to create DH file:
+
+openssl dhparam -out /etc/letsencrypt/live/yourdomain.com/rpc_server.pem 2048
+
+Added new JSON RPC method resolveopenalias which may be used e.g. in wallets.
+
+Release notes Karbowanec 1.7.5
+
+This release contains improvements in JSON RPC methods and therefore is especially recommended to public nodes whose API is exposed to the world. Namely:
+
+- Fixed JSON serialization of float numbers
+- An error is returned if some of the reserve proof's transactions couldn't be found
+- Limit the number of requested blocks in some methods
+- Improve error handling in some methods
+
+Release notes Karbowanec 1.7.4
+
+- The update of Base58 encoding of signatures of messages
+- The implementation of sign/verify messages in greenwallet and walletd
+- The alt. blocks RPC method getaltblockslist, which, obviously, returns a list of alt. blocks short info (only those stored by given node)
+- Checkpoints source files were moved to a separate folder
+
+Release notes Karbowanec 1.7.3
+
+- Change storage for various blockchain indexes
+- Exposed these RESTful-like API endpoints for GET requests
+    /api/block/height/[height] - returns block info in JSON by height
+    /api/block/hash/[hash] - returns block info in JSON by hash
+    /api/transaction/[hash] - returns transaction info in JSON by hash
+    /api/payment_id/[hash] - returns the list of transaction hashes by payment id in JSON
+- Changes in node server
+    Added nice HTML output to / path with basic stats
+    Added plain HTML /supply endpoint that returns a string with total coins in circulation
+    Moved /paimentid endpoint to the plain HTML output of randomly generated payment id instead of JSON
+
+Release notes Karbowanec 1.7.2
+
+- Change spent key images storage (reduce memory usage)
+- Deterministic transaction keys
+- Fixed missing address file name when import tracking wallet
+- Fixed validation on atypical to domains
+- Flat-rate fee for public nodes
+- Poor man's Dandelion protocol
+- Proper Base58 encoding of proofs
+- Small optimization in pushBlock: do not recalculate block hash
+- Tidyup crypto: make crypto primitives more clear, move scattered and repeated definitions to one place, add some new crypto functions, fix compiler warning
+- --enable-blockchain-indexes now has a short alias -i
+
+Release notes Karbowanec 1.7.1
+ 
+- Attempt to restore corrupted blockindexes.dat
+- Platform independent randomness
+- Improvements in simplewallet
+- Node update with new endpoints, including info about connections for display in GUI Wallet
+- Fix of fee check in Core, fixes syncing from zero with the flag --without-checkpoints
+- Ban nodes that stuck too deep behind on fork to spare useless traffic
+- Changes in P2P:
+    Moved P2P protocol version to common config
+    Added warning about outdated software
+    Added dropping the connection to outdated too much nodes
+    Added anchor connections, based on https://eprint.iacr.org/2015/263.pdf §4
+- Change how we deal with unmixable outputs in wallet:
+    if transaction is zero mixin, first take all unmixable outputs to send, then normal outputs
+    for transactions with mixin first, take normal outputs, only if not enough take dust, unmixable outputs, obviously, not used for sending
+    sweep_dust command is removed from simplewallet
+    the warning is displayed when the user has unmixable outputs that he can get rid of them by sending tx with zero mixin
+    in the edge case of so many unmixable outputs that it will make tx invalid due to exceeding tx size limit user will have to send them in chunks (at cost of an extra fee, but old behaviour is the same)
+    Add tools to get some useful statistics via RPC e.g. for building historical charts
+
+The above changes are partially based on TurtleCoin and Monero solutions.
 
 Release notes Karbowanec 1.4.8
 
@@ -77,7 +221,7 @@ Release notes Karbowanec 1.3.0
 - Daemon restricted RPC mode
 - Fees for open remote node
 
-## Release Notes from Bytecoin
+######## Release Notes from Bytecoin ########
 
 Release notes 1.0.11
 

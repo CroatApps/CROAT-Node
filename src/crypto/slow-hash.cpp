@@ -1,21 +1,21 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
-// Copyright (c) 2017-2019, The CROAT.community developers
 //
-// This file is part of Bytecoin.
+// This file is part of Karbo.
 //
-// Bytecoin is free software: you can redistribute it and/or modify
+// Karbo is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Bytecoin is distributed in the hope that it will be useful,
+// Karbo is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with Bytecoin.  If not, see <http://www.gnu.org/licenses/>.
+// along with Karbo.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <assert.h>
 #include <new>
 
 #include "hash.h"
@@ -39,13 +39,13 @@ namespace Crypto {
   cn_context::cn_context() {
     data = VirtualAlloc(nullptr, MAP_SIZE, MEM_COMMIT, PAGE_READWRITE);
     if (data == nullptr) {
-      throw bad_alloc();
+      throw std::bad_alloc();
     }
   }
 
   cn_context::~cn_context() {
     if (!VirtualFree(data, 0, MEM_RELEASE)) {
-      throw bad_alloc();
+      assert(false);
     }
   }
 
@@ -65,8 +65,8 @@ namespace Crypto {
 
   cn_context::~cn_context() {
     if (munmap(data, MAP_SIZE) != 0) {
-    //  throw bad_alloc();
-		std::terminate();
+      assert(false);
+      std::terminate();
     }
   }
 

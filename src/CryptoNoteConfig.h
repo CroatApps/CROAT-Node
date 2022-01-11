@@ -50,6 +50,9 @@ const uint64_t CRYPTONOTE_MAX_BLOCK_NUMBER                   = 500000000;
 const size_t   CRYPTONOTE_MAX_BLOCK_BLOB_SIZE                = 500000000;
 const size_t   CRYPTONOTE_MAX_TX_SIZE                        = 1000000000;
 const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX       = 70; // CROAT
+const uint64_t CRYPTONOTE_TX_PROOF_BASE58_PREFIX             = 3576968; // (0x369488), starts with "Proof..."
+const uint64_t CRYPTONOTE_RESERVE_PROOF_BASE58_PREFIX        = 44907175188; // (0xa74ad1d14), starts with "RsrvPrf..."
+const uint64_t CRYPTONOTE_KEYS_SIGNATURE_BASE58_PREFIX       = 176103705; // (0xa7f2119), starts with "SigV1..."
 const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW          = 7; // CROAT
 const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW_V1       = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
 const size_t   CRYPTONOTE_TX_SPENDABLE_AGE                   = 6;
@@ -80,12 +83,17 @@ const size_t   CRYPTONOTE_DISPLAY_DECIMAL_POINT              = 11; // CROAT
 const uint64_t MINIMUM_FEE                                   = UINT64_C(1000000);
 const uint64_t MAXIMUM_FEE                                   = UINT64_C(1000000);
 
-const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(1000000);
+const uint64_t DEFAULT_DUST_THRESHOLD                        = UINT64_C(10000000);
 const uint64_t MIN_TX_MIXIN_SIZE                             = 1;
 const uint64_t MAX_TX_MIXIN_SIZE                             = 5;
+const uint64_t MAX_EXTRA_SIZE                                = 1024;
 
 //const uint64_t MAX_TRANSACTION_SIZE_LIMIT                    = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE_CURRENT / 4 - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
 const uint64_t MAX_TRANSACTION_SIZE_LIMIT                    = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE * 125 / 100 - CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE;
+const size_t   DANDELION_EPOCH                               = 600;
+const size_t   DANDELION_STEMS                               = 2;
+const size_t   DANDELION_STEM_EMBARGO                        = 173;
+const uint8_t  DANDELION_STEM_TX_PROPAGATION_PROBABILITY     = 90;
 
 const size_t   DIFFICULTY_WINDOW                             = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY; // blocks
 const size_t   DIFFICULTY_WINDOW_V2                          = DIFFICULTY_WINDOW;  // blocks v3
@@ -158,18 +166,47 @@ const size_t   BLOCKS_IDS_SYNCHRONIZING_DEFAULT_COUNT        =  10000;  //by def
 const size_t   BLOCKS_SYNCHRONIZING_DEFAULT_COUNT            =  128;    //by default, blocks count in blocks downloading
 const size_t   COMMAND_RPC_GET_BLOCKS_FAST_MAX_COUNT         =  1000;
 
+// Non SSL Ports
 const int      P2P_DEFAULT_PORT                              =  46347;
 const int      RPC_DEFAULT_PORT                              =  46348;
+const int      WALLET_RPC_DEFAULT_PORT                       =  15000;
+const int      GATE_RPC_DEFAULT_PORT                         =  16000;
 
+// SSL Ports
+const int      RPC_DEFAULT_SSL_PORT                          =  46448;
+const int      WALLET_RPC_DEFAULT_SSL_PORT                   =  15100;
+const int      GATE_RPC_DEFAULT_SSL_PORT                     =  16100;
+
+// SSL Certs
+const char     RPC_DEFAULT_CHAIN_FILE[]                      = "rpc_server.crt";
+const char     RPC_DEFAULT_KEY_FILE[]                        = "rpc_server.key";
+const char     RPC_DEFAULT_DH_FILE[]                         = "rpc_server.pem";
+
+// Peers Limits
 const size_t   P2P_LOCAL_WHITE_PEERLIST_LIMIT                =  1000;
 const size_t   P2P_LOCAL_GRAY_PEERLIST_LIMIT                 =  5000;
 
+// This defines our current P2P network version
+// and the minimum version for communication between nodes
+const uint8_t  P2P_VERSION_1                                 = 1;
+const uint8_t  P2P_VERSION_2                                 = 2;
+const uint8_t  P2P_CURRENT_VERSION                           = 3;
+const uint8_t  P2P_MINIMUM_VERSION                           = 1;
+
+// This defines the number of versions ahead we must see peers before
+// we start displaying warning messages that we need to upgrade our software
+const uint8_t  P2P_UPGRADE_WINDOW                            = 2;
+
+// This defines the minimum P2P version required for lite blocks propogation
+const uint8_t  P2P_LITE_BLOCKS_PROPOGATION_VERSION           = 3;
 const size_t   P2P_CONNECTION_MAX_WRITE_BUFFER_SIZE          = 64 * 1024 * 1024; // 64 MB
-const uint32_t P2P_DEFAULT_CONNECTIONS_COUNT                 = 10;
+const uint32_t P2P_DEFAULT_CONNECTIONS_COUNT                 = 12;
+const size_t   P2P_DEFAULT_ANCHOR_CONNECTIONS_COUNT          = 2;
 const size_t   P2P_DEFAULT_WHITELIST_CONNECTIONS_PERCENT     = 70;
 const uint32_t P2P_DEFAULT_HANDSHAKE_INTERVAL                = 60;            // seconds
 const uint32_t P2P_DEFAULT_PACKET_MAX_SIZE                   = 50000000;      // 50000000 bytes maximum packet size
 const uint32_t P2P_DEFAULT_PEERS_IN_HANDSHAKE                = 250;
+const uint32_t P2P_MAX_PEERS_IN_HANDSHAKE                    = 256;
 const uint32_t P2P_DEFAULT_CONNECTION_TIMEOUT                = 5000;          // 5 seconds
 const uint32_t P2P_DEFAULT_PING_CONNECTION_TIMEOUT           = 2000;          // 2 seconds
 const uint64_t P2P_DEFAULT_INVOKE_TIMEOUT                    = 60 * 2 * 1000; // 2 minutes
@@ -182,23 +219,24 @@ const uint32_t P2P_IDLE_CONNECTION_KILL_INTERVAL             = (5 * 60);      //
 const char     P2P_STAT_TRUSTED_PUB_KEY[]                    = "";
 
 const char* const SEED_NODES[] = { 
-  "173.199.71.78:46347",                // Node-01 CROAT.community
-  "104.238.167.37:46347",               // Node-02 CROAT.community
+  "194.163.182.12:46347",               // Node-01 CROAT.community
+  "194.163.180.123:46347",              // Node-02 CROAT.community
   "199.247.17.199:46347",               // Node-04 CROAT.community  
-  "173.249.32.180:46347",               // Node-01 de CROAT Pirineus
-  "80.241.213.210:46347",               // Node-02 de CROAT Pirineus
+  "207.180.226.44:46347",               // Node-05 CROAT.community  
+  "173.249.32.180:46347",               // Node-02 de CROAT Pirineus
+  "167.86.112.238:46347",               // Node-03 de CROAT Pirineus  
   "199.247.29.17:46347",                // Node de POOL.CAT 
-  "207.180.226.44:46347",               // Node de CROAT.pro
+  
 };
 
 const char* const TRUSTED_NODES[] = {
-  "173.199.71.78",                  // Node-01 CROAT.community
-  "104.238.167.37",                 // Node-02 CROAT.community
+  "194.163.182.12",                 // Node-01 CROAT.community
+  "194.163.180.123",                // Node-02 CROAT.community
   "199.247.17.199",                 // Node-04 CROAT.community
-  "173.249.32.180",                 // Node-01 de CROAT Pirineus
-  "80.241.213.210",                 // Node-02 de CROAT Pirineus
+  "207.180.226.44",                 // Node-05 CROAT.community    
+  "173.249.32.180",                 // Node-02 de CROAT Pirineus
+  "167.86.112.238",                 // Node-03 de CROAT Pirineus  
   "199.247.29.17",                  // Node de POOL.CAT 
-  "207.180.226.44",                 // Node de CROAT.pro
 };
 
 } // CryptoNote

@@ -48,7 +48,7 @@ namespace WalletConfig
 
 
     /* The mixin value to use with transactions */
-    const uint64_t defaultMixin = 2;
+    const uint64_t defaultMixin = 1;
 
     /* The default fee value to use with transactions (in ATOMIC units!) */
     const uint64_t defaultFee = CryptoNote::parameters::MINIMUM_FEE; 

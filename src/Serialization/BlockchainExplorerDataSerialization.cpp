@@ -138,6 +138,7 @@ void serialize(TransactionExtraDetails2& extra, ISerializer& serializer) {
   serializePod(extra.publicKey, "publicKey", serializer);
   serializer(extra.nonce, "nonce");
   serializeAsBinary(extra.raw, "raw", serializer);
+  serializer(extra.size, "size");
 }
 
 void serialize(TransactionDetails& transaction, ISerializer& serializer) {

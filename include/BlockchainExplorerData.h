@@ -117,6 +117,7 @@ struct TransactionExtraDetails2 {
 	Crypto::PublicKey publicKey;
 	BinaryArray nonce;
 	BinaryArray raw;
+  size_t size = 0;
 };
 
 struct TransactionDetails {

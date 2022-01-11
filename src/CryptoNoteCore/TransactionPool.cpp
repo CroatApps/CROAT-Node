@@ -143,7 +143,7 @@ namespace CryptoNote {
     }
 
     const uint64_t fee = inputs_amount - outputs_amount;
-    bool isFusionTransaction = fee == 0 && m_currency.isFusionTransaction(tx, blobSize, m_core.get_current_blockchain_height());
+    bool isFusionTransaction = fee == 0 && m_currency.isFusionTransaction(tx, blobSize, m_core.getCurrentBlockchainHeight());
 
     //check key images for transaction if it is not kept by block
     if (!keptByBlock) {
@@ -249,6 +249,20 @@ namespace CryptoNote {
     removeTransaction(it);
     return true;
   }
+
+  //---------------------------------------------------------------------------------
+  bool tx_memory_pool::getTransaction(const Crypto::Hash& id, Transaction& tx) {
+    std::lock_guard<std::recursive_mutex> lock(m_transactions_lock);
+    auto it = m_transactions.find(id);
+    if (it == m_transactions.end()) {
+      return false;
+    }
+
+    auto& txd = *it;
+    tx = txd.tx;
+
+    return true;
+  }
   //---------------------------------------------------------------------------------
   size_t tx_memory_pool::get_transactions_count() const {
     std::lock_guard<std::recursive_mutex> lock(m_transactions_lock);
@@ -287,12 +301,12 @@ namespace CryptoNote {
       TransactionCheckInfo checkInfo(tx);
 	  if (m_validated_transactions.find(tx.id) != m_validated_transactions.end()) {
 		  ready_tx_ids.insert(tx.id);
-		  logger(DEBUGGING) << "MemPool - tx " << tx.id << " loaded from cache";
+		  logger(TRACE) << "MemPool - tx " << tx.id << " loaded from cache";
 	  }
 	  else if (is_transaction_ready_to_go(tx.tx, checkInfo)) {
 		  ready_tx_ids.insert(tx.id);
 		  m_validated_transactions.insert(tx.id);
-		  logger(DEBUGGING) << "MemPool - tx " << tx.id << " added to cache";
+		  logger(TRACE) << "MemPool - tx " << tx.id << " added to cache";
 	  }
     }
 
@@ -396,6 +410,7 @@ namespace CryptoNote {
 
     total_size = 0;
     fee = 0;
+    int counter = 0;
 
     size_t max_total_size = (125 * median_size) / 100;
     max_total_size = std::min(max_total_size, maxCumulativeSize) - m_currency.minerTxBlobReservedSize();
@@ -403,6 +418,8 @@ namespace CryptoNote {
     BlockTemplate blockTemplate;
 
     for (auto i = m_fee_index.begin(); i != m_fee_index.end(); ++i) {
+      if (counter == 127)
+        break;
       const auto& txd = *i;
 
       size_t blockSizeLimit = (txd.fee == 0) ? median_size : max_total_size;
@@ -411,8 +428,8 @@ namespace CryptoNote {
       }
 
       tx_verification_context tvc = boost::value_initialized<tx_verification_context>();
-      if (!m_core.check_tx_fee(txd.tx, txd.blobSize, tvc, m_core.get_current_blockchain_height())) {
-        logger(DEBUGGING) << "Transaction " << txd.id << " not included to block template because fee is too small";
+      if (!m_core.check_tx_fee(txd.tx, getObjectHash(txd.tx), txd.blobSize, tvc, m_core.getCurrentBlockchainHeight())) {
+        logger(DEBUGGING) << "Transaction " << txd.id << " not included to block template because fee is insufficient";
         continue;
       }
 
@@ -436,6 +453,7 @@ namespace CryptoNote {
       if (ready && blockTemplate.addTransaction(txd.id, txd.tx)) {
         total_size += txd.blobSize;
         fee += txd.fee;
+        ++counter;
         logger(DEBUGGING) << "Transaction " << txd.id << " included to block template";
       } else {
         logger(DEBUGGING) << "Transaction " << txd.id << " is failed to include to block template";

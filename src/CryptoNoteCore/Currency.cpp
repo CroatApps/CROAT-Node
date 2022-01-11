@@ -25,6 +25,7 @@
 #include <boost/lexical_cast.hpp>
 #include "../Common/Base58.h"
 #include "../Common/int-util.h"
+#include "../Common/FormatTools.h"
 #include "../Common/StringTools.h"
 
 #include "Account.h"
@@ -76,9 +77,9 @@ namespace CryptoNote {
 		}
 
 		if (isTestnet()) {
-			m_upgradeHeightV2 = 1;
-			m_upgradeHeightV3 = 2;
-			m_upgradeHeightV4 = 5;
+			m_upgradeHeightV2 = 10;
+			m_upgradeHeightV3 = 60;
+			m_upgradeHeightV4 = 70;
 			m_blocksFileName = "testnet_" + m_blocksFileName;
 			m_blocksCacheFileName = "testnet_" + m_blocksCacheFileName;
 			m_blockIndexesFileName = "testnet_" + m_blockIndexesFileName;
@@ -158,7 +159,7 @@ namespace CryptoNote {
 		size_t blockGrantedFullRewardZone = blockGrantedFullRewardZoneByBlockVersion(blockMajorVersion);
 		medianSize = std::max(medianSize, blockGrantedFullRewardZone);
 		if (currentBlockSize > UINT64_C(2) * medianSize) {
-			logger(TRACE) << "Block cumulative size is too big: " << currentBlockSize << ", expected less than " << 2 * medianSize;
+			logger(DEBUGGING) << "Block cumulative size is too big: " << currentBlockSize << ", expected less than " << 2 * medianSize;
 			return false;
 		}
 
@@ -365,58 +366,15 @@ namespace CryptoNote {
 	}
 
 	std::string Currency::formatAmount(uint64_t amount) const {
-		std::string s = std::to_string(amount);
-		if (s.size() < m_numberOfDecimalPlaces + 1) {
-			s.insert(0, m_numberOfDecimalPlaces + 1 - s.size(), '0');
-		}
-		s.insert(s.size() - m_numberOfDecimalPlaces, ".");
-		return s;
+		return Common::Format::formatAmount(amount);
 	}
 
 	std::string Currency::formatAmount(int64_t amount) const {
-		std::string s = formatAmount(static_cast<uint64_t>(std::abs(amount)));
-
-		if (amount < 0) {
-			s.insert(0, "-");
-		}
-
-		return s;
+    return Common::Format::formatAmount(amount);
 	}
 
 	bool Currency::parseAmount(const std::string& str, uint64_t& amount) const {
-		std::string strAmount = str;
-		boost::algorithm::trim(strAmount);
-
-		size_t pointIndex = strAmount.find_first_of('.');
-		size_t fractionSize;
-		if (std::string::npos != pointIndex) {
-			fractionSize = strAmount.size() - pointIndex - 1;
-			while (m_numberOfDecimalPlaces < fractionSize && '0' == strAmount.back()) {
-				strAmount.erase(strAmount.size() - 1, 1);
-				--fractionSize;
-			}
-			if (m_numberOfDecimalPlaces < fractionSize) {
-				return false;
-			}
-			strAmount.erase(pointIndex, 1);
-		}
-		else {
-			fractionSize = 0;
-		}
-
-		if (strAmount.empty()) {
-			return false;
-		}
-
-		if (!std::all_of(strAmount.begin(), strAmount.end(), ::isdigit)) {
-			return false;
-		}
-
-		if (fractionSize < m_numberOfDecimalPlaces) {
-			strAmount.append(m_numberOfDecimalPlaces - fractionSize, '0');
-		}
-
-		return Common::fromString(strAmount, amount);
+		return Common::Format::parseAmount(str, amount);
 	}
 
 	// Copyright (c) 2017-2018 Zawy 
@@ -430,8 +388,9 @@ namespace CryptoNote {
 		double minFee = gauge * CryptoNote::parameters::COIN * static_cast<double>(avgHistoricalDifficulty) 
 			/ dailyDifficultyMoore * static_cast<double>(reward)
 			/ static_cast<double>(medianHistoricalReward);
+		// zero test
 		if (minFee == 0 || !std::isfinite(minFee))
-			return CryptoNote::parameters::MAXIMUM_FEE; // zero test 
+			return CryptoNote::parameters::MAXIMUM_FEE;
 		minimumFee = static_cast<uint64_t>(minFee);
 
 		return std::min<uint64_t>(CryptoNote::parameters::MAXIMUM_FEE, minimumFee);

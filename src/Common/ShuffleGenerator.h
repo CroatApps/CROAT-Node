@@ -1,4 +1,7 @@
 // Copyright (c) 2012-2016, The CryptoNote developers, The Bytecoin developers
+// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2018-2019, The TurtleCoin Developers
+// Copyright (c) 2018-2019, The Karbo Developers
 // Copyright (c) 2017-2019, The CROAT.community developers
 //
 // This file is part of Bytecoin.
@@ -18,15 +21,16 @@
 
 #pragma once
 
+#include <crypto/random.h>
+#include <stdexcept>
 #include <unordered_map>
-#include <random>
 
-template <typename T, typename Gen>
+template <typename T>
 class ShuffleGenerator {
 public:
 
-  ShuffleGenerator(T n, const Gen& gen = Gen()) :
-    N(n), generator(gen), count(n) {}
+  ShuffleGenerator(T n) :
+    N(n), count(n) {}
 
   T operator()() {
 
@@ -34,12 +38,7 @@ public:
       throw std::runtime_error("shuffle sequence ended");
     }
 
-    typedef typename std::uniform_int_distribution<T> distr_t;
-    typedef typename distr_t::param_type param_t;
-
-    distr_t distr;
-    
-    T value = distr(generator, param_t(0, --count));
+	T value = Random::randomValue<T>(0, --count);
 
     auto rvalIt = selected.find(count);
     auto rval = rvalIt != selected.end() ? rvalIt->second : count;
@@ -70,5 +69,4 @@ private:
   std::unordered_map<T, T> selected;
   T count;
   const T N;
-  Gen generator;
 };

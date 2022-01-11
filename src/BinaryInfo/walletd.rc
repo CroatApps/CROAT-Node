@@ -4,8 +4,8 @@
 IDI_ICON1    ICON    DISCARDABLE    "icons/croatcoin.ico"
 
 VS_VERSION_INFO VERSIONINFO
-  FILEVERSION CN_VER_MAJOR,CN_VER_MINOR,CN_VER_REV,CN_VER_BUILD
-  PRODUCTVERSION CN_VER_MAJOR,CN_VER_MINOR,CN_VER_REV,CN_VER_BUILD
+  FILEVERSION VER_MAJOR,VER_MINOR,VER_REV,VER_BUILD
+  PRODUCTVERSION VER_MAJOR,VER_MINOR,VER_REV,VER_BUILD
   FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
   FILEFLAGS VS_FF_DEBUG
@@ -20,13 +20,13 @@ VS_VERSION_INFO VERSIONINFO
     BEGIN
       BLOCK "000004b0"
       BEGIN
-        VALUE "CompanyName",      CN_PROJECT_SITE
-        VALUE "FileDescription",  CN_PROJECT_NAME " Walletd " CN_PROJECT_VERSION
-        VALUE "FileVersion",      CN_PROJECT_VERSION_BUILD_NO
-        VALUE "LegalCopyright",   CN_PROJECT_COPYRIGHT
+        VALUE "CompanyName",      PROJECT_SITE
+        VALUE "FileDescription",  PROJECT_NAME " Walletd " PROJECT_VERSION
+        VALUE "FileVersion",      PROJECT_VERSION_BUILD_NO
+        VALUE "LegalCopyright",   PROJECT_COPYRIGHT
         VALUE "OriginalFilename", "walletd.exe"
-        VALUE "ProductName",      CN_PROJECT_NAME
-        VALUE "ProductVersion",   CN_PROJECT_VERSION
+        VALUE "ProductName",      PROJECT_NAME
+        VALUE "ProductVersion",   PROJECT_VERSION
       END
     END
     BLOCK "VarFileInfo"

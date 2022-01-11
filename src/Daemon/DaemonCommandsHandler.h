@@ -29,7 +29,7 @@
 #include "Rpc/RpcServer.h"
 
 namespace CryptoNote {
-class core;
+class Core;
 class NodeServer;
 class ICryptoNoteProtocolQuery;
 }
@@ -37,7 +37,7 @@ class ICryptoNoteProtocolQuery;
 class DaemonCommandsHandler
 {
 public:
-  DaemonCommandsHandler(CryptoNote::core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log, const CryptoNote::ICryptoNoteProtocolQuery& protocol, CryptoNote::RpcServer* prpc_server);
+  DaemonCommandsHandler(CryptoNote::Core& core, CryptoNote::NodeServer& srv, Logging::LoggerManager& log, const CryptoNote::ICryptoNoteProtocolQuery& protocol, CryptoNote::RpcServer* prpc_server);
 
   bool start_handling() {
     m_consoleHandler.start();
@@ -51,7 +51,7 @@ public:
 private:
 
   Common::ConsoleHandler m_consoleHandler;
-  CryptoNote::core& m_core;
+  CryptoNote::Core& m_core;
   CryptoNote::NodeServer& m_srv;
   Logging::LoggerRef logger;
   Logging::LoggerManager& m_logManager;
@@ -87,4 +87,5 @@ private:
   bool ban(const std::vector<std::string>& args);
   bool unban(const std::vector<std::string>& args);
   bool status(const std::vector<std::string>& args);
+  bool save(const std::vector<std::string>& args);
 };
