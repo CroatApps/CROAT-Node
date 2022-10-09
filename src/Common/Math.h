@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <limits>
 #include "StringTools.h"
 
 namespace Common {

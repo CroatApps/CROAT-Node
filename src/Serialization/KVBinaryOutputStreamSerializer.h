@@ -19,6 +19,7 @@
 #pragma once
 
 #include <vector>
+#include <limits>
 #include <Common/IOutputStream.h>
 #include "ISerializer.h"
 #include "MemoryStream.h"

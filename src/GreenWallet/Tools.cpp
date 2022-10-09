@@ -19,6 +19,7 @@
 #include <CryptoNoteCore/TransactionExtra.h>
 
 #include <iostream>
+#include <thread>
 
 #include <Common/ColouredMsg.h>
 #include <Common/PasswordContainer.h>

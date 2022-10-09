@@ -17,6 +17,7 @@
 #include <CryptoNoteCore/TransactionExtra.h>
 
 #include <iostream>
+#include <thread>
 
 #include "IWallet.h"
 

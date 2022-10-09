@@ -10,6 +10,7 @@
 #include <Common/StringTools.h>
 
 #include <iostream>
+#include <thread>
 
 #include <Common/ColouredMsg.h>
 #include <GreenWallet/CommandImplementations.h>

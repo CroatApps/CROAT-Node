@@ -6,6 +6,7 @@
 ///////////////////////////////
 #include <GreenWallet/GetInput.h>
 ///////////////////////////////
+#include <thread>
 
 #include <boost/algorithm/string.hpp>
 

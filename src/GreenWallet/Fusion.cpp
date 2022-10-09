@@ -10,6 +10,7 @@
 #include "CryptoNoteConfig.h"
 
 #include <iostream>
+#include <thread>
 
 #include <Wallet/WalletGreen.h>
 
